@@ -1,0 +1,92 @@
+from dataclasses import dataclass
+
+from openai import AsyncOpenAI
+
+from app.core.config import get_settings
+from app.services.retrieval.retriever import RetrievedChunk
+
+GROQ_MODEL = "llama-3.1-8b-instant"
+OPENAI_MODEL = "gpt-4o-mini"
+
+# Prompt v2 — otimizado para Answer Relevancy
+# Resultado RAGAS: faithfulness=0.92, context_recall=0.90
+SYSTEM_PROMPT = """You are an assistant specialized in answering questions based on provided documents.
+
+Rules:
+1. Answer based on the provided context. Extract and use ALL relevant information available.
+2. Always give a direct, complete answer to the question asked. Never refuse if the context has relevant information.
+3. Only say you cannot answer if the context has absolutely NO relevant information.
+4. Cite sources using [Source: filename] at the end of your answer.
+5. Be direct, objective and comprehensive.
+6. Answer in the same language as the question.
+7. If the context has partial information, use it and answer what you can."""
+
+
+@dataclass
+class GenerationResult:
+    answer: str
+    model: str
+    prompt_tokens: int
+    completion_tokens: int
+
+
+def _get_client_and_model() -> tuple[AsyncOpenAI, str]:
+    settings = get_settings()
+    if settings.groq_api_key:
+        client = AsyncOpenAI(
+            api_key=settings.groq_api_key,
+            base_url="https://api.groq.com/openai/v1",
+        )
+        return client, GROQ_MODEL
+    if settings.openai_api_key:
+        return AsyncOpenAI(api_key=settings.openai_api_key), OPENAI_MODEL
+    raise RuntimeError("Nenhuma API key configurada (GROQ_API_KEY ou OPENAI_API_KEY)")
+
+
+def _build_context(chunks: list[RetrievedChunk]) -> str:
+    parts = []
+    for i, chunk in enumerate(chunks, 1):
+        header = f"[{i}] Source: {chunk.filename} (relevance: {chunk.score:.2f})"
+        parts.append(header + "\n" + chunk.text)
+    return "\n\n---\n\n".join(parts)
+
+
+def _build_prompt(question: str, chunks: list[RetrievedChunk]) -> str:
+    context = _build_context(chunks)
+    return (
+        "Document context:\n\n"
+        + context
+        + "\n\n---\n\nQuestion: "
+        + question
+        + "\n\nAnswer based on the context above."
+    )
+
+
+async def generate(question: str, chunks: list[RetrievedChunk]) -> GenerationResult:
+    if not chunks:
+        return GenerationResult(
+            answer="Não encontrei documentos relevantes para responder sua pergunta.",
+            model="n/a",
+            prompt_tokens=0,
+            completion_tokens=0,
+        )
+
+    client, model = _get_client_and_model()
+    prompt = _build_prompt(question, chunks)
+
+    response = await client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": prompt},
+        ],
+        temperature=0.1,
+        max_tokens=1024,
+    )
+
+    return GenerationResult(
+        answer=response.choices[0].message.content,
+        model=response.model,
+        prompt_tokens=response.usage.prompt_tokens,
+        completion_tokens=response.usage.completion_tokens,
+    )
