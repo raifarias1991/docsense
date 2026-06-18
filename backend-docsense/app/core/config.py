@@ -55,9 +55,9 @@ class Settings(BaseSettings):
     # quando a variável estivesse vazia ou ausente no ambiente).
     # Use a property  para obter a lista real.
     _CORS_DEFAULTS: str = (
-        "http://localhost:3000,http://localhost:3001,"
-        "http://127.0.0.1:3000,https://docsense-app.netlify.app,"
-        "https://docdocense.netlify.app"
+    "http://localhost:3000,http://localhost:3001,"
+    "http://127.0.0.1:3000,https://docsense-app.netlify.app,"
+    "https://docdocense.netlify.app"
     )
     allowed_origins_raw: str = ""
 
