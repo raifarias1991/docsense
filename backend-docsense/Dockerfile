@@ -1,6 +1,6 @@
 FROM python:3.12-slim
 
-WORKDIR /app
+WORKDIR /code
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc g++ libffi-dev \
@@ -27,8 +27,8 @@ RUN pip install --no-cache-dir \
     python-dotenv \
     groq
 
-# Contexto de build é a raiz do repo — caminho completo necessário
-COPY backend-docsense/app/ ./app/
+# Contexto é backend-docsense/ — copia tudo direto
+COPY . .
 
 ENV PORT=8000
 
