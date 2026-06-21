@@ -1,7 +1,14 @@
-[build]
-  base = "frontend-docsense"
-  command = "npm run build"
-  publish = ".next"
+# ─── COLOQUE ESTE ARQUIVO NA RAIZ DO REPOSITÓRIO ─────────────────────────────
+# /netlify.toml  (não dentro de frontend-docsense/)
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+[build]
+  base    = "frontend-docsense"   # pasta do frontend no repo
+  command = "npm run build"
+  publish = ".next"               # relativo ao base acima
+
+# Variáveis de ambiente de build
+# Configure API_URL no painel do Netlify → Site settings → Environment variables
+# NÃO use NEXT_PUBLIC_API_URL (foi removido — a URL do backend não fica exposta ao browser)
