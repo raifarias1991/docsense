@@ -27,7 +27,8 @@ RUN pip install --no-cache-dir \
     python-dotenv \
     groq
 
-COPY app/ ./app/
+# Contexto de build é a raiz do repo — caminho completo necessário
+COPY backend-docsense/app/ ./app/
 
 ENV PORT=8000
 
