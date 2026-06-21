@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================= */
+/*           BASE TOKENS         */
+/* ============================= */
+
+@layer base {
+  :root {
+    /* DocSense Dark Theme */
+
+    --background: 240 10% 4%;
+    --foreground: 210 40% 98%;
+
+    --surface: 240 10% 8%;
+    --card: 240 10% 8%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 240 10% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    --border: 240 12% 14%;
+    --input: 240 12% 14%;
+
+    --primary: 239 84% 67%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 243 75% 59%;
+
+    --secondary: 263 70% 58%;
+    --secondary-foreground: 0 0% 100%;
+
+    --accent: 189 94% 43%;
+    --accent-foreground: 0 0% 100%;
+
+    --muted: 240 10% 14%;
+    --muted-foreground: 215 20% 60%;
+
+    --ring: 239 84% 67%;
+
+    --radius: 0.625rem;
+
+    --success: 160 84% 39%;
+    --warning: 38 92% 50%;
+    --error: 0 84% 60%;
+    --cyan: 189 94% 43%;
+    --cyan-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+  }
+}
+
+/* ============================= */
+/*           GLOBAL BASE         */
+/* ============================= */
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  /* Custom scrollbar */
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-surface;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground;
+  }
+}
+
+/* ============================= */
+/*           UTILITIES           */
+/* ============================= */
+
+@layer utilities {
+  .glass {
+    @apply bg-surface/60 backdrop-blur-md border border-border/50;
+  }
+
+  .glass-strong {
+    @apply bg-surface/80 backdrop-blur-xl border border-border;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent;
+  }
+
+  .text-gradient-cyan {
+    @apply bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent;
+  }
+
+  .skeleton {
+    @apply animate-pulse bg-surface rounded-md;
+  }
+}
